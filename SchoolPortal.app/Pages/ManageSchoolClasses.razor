@@ -1,0 +1,110 @@
+﻿@page "/ManageSchoolClasses"
+@using School_Portal.app.Services
+@using School_Portal.app.Models 
+
+@inject SchoolClassService service
+
+
+
+<Container Fluid="true">
+    <div class="container">
+        <div class="row bg-light">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>SchoolClass ID</th>
+                        <th>Name</th>
+                        <th>Year</th>
+                        <th>Delete SchoolClass</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (SchoolClasses.Any())
+                    {
+                        @foreach (var schoolClass in SchoolClasses)
+                        {
+                            <tr @onclick="(() => SetSchoolClassForUpdate(schoolClass))">
+                                <td>@schoolClass.SchoolClassID</td>
+                                <td>@schoolClass.SchoolClassName</td>
+                                <td>@schoolClass.Year</td>
+                                <td><button class="btn btn-danger" @onclick="(() => DeleteSchoolClass(schoolClass))">Delete</button></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6"><strong>No schoolClasss available</strong></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="row m-5">
+            <div class="col-5 bg-light m-2 justify-content-start">
+                <div class="p-3 mb-3 bg-primary text-white text-center">Add New SchoolClass</div>
+                <EditForm Model="@NewSchoolClass">
+                    <div class="form-group">
+                        <label for="name">SchoolClass Name</label>
+                        <input type="text" id="name" class="form-control" @bind-value="@NewSchoolClass.SchoolClassName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <input type="text" id="year" class="form-control" @bind="@NewSchoolClass.Year" />
+                    </div>
+                    <div class="text-center p-3 mb-3">
+                        <button class="btn btn-info" @onclick="AddNewSchoolClass"> Add SchoolClass</button>
+                    </div>
+                </EditForm>
+            </div>
+            <div class="col-5 bg-light m-2 justify-content-end">
+                <div class="p-3 mb-1 bg-primary text-white text-center">Update SchoolClass</div>
+                <EditForm Model="@UpdateSchoolClass">
+                    <div class="form-group">
+                        <label for="name">SchoolClass Name</label>
+                        <input type="text" id="name" class="form-control" @bind-value="@UpdateSchoolClass.SchoolClassName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year</label>
+                        <input type="text" id="year" class="form-control" @bind="@UpdateSchoolClass.Year" />
+                    </div>
+                    <div class="text-center p-3 mb-3">
+                        <button class="btn btn-info" @onclick="UpdateSchoolClassData"> Update SchoolClass</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</Container>
+
+@code {
+    List<SchoolClass> SchoolClasses = new List<SchoolClass>();
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshSchoolClasses();
+    }
+    private async Task RefreshSchoolClasses()
+    {
+        SchoolClasses = await service.GetSchoolClassAsync();
+    }
+    public SchoolClass NewSchoolClass { get; set; } = new SchoolClass();
+    private async Task AddNewSchoolClass()
+    {
+        await service.AddSchoolClassAsync(NewSchoolClass);
+        NewSchoolClass = new SchoolClass();
+        await RefreshSchoolClasses();
+    }
+    SchoolClass UpdateSchoolClass = new SchoolClass();
+    private void SetSchoolClassForUpdate(SchoolClass schoolClass)
+    {
+        UpdateSchoolClass = schoolClass;
+    }
+    private async Task UpdateSchoolClassData()
+    {
+        await service.UpdateSchoolClassAsync(UpdateSchoolClass);
+        await RefreshSchoolClasses();
+    }
+    private async Task DeleteSchoolClass(SchoolClass schoolClass)
+    {
+        await service.DeleteSchoolClassAsync(schoolClass);
+        await RefreshSchoolClasses();
+    }
+}

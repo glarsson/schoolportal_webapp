@@ -1,0 +1,122 @@
+﻿@inherits LayoutComponentBase
+
+<Layout Sider="true">
+    <LayoutSider>
+        <LayoutSiderContent>
+            <!-- SIDE NAVIGATION BAR FOR LOGGED IN USERS -->
+            <AuthorizeView>
+                <Authorized>
+                    <Bar Mode="BarMode.VerticalInline"
+                         CollapseMode="BarCollapseMode.Small"
+                         Breakpoint="Breakpoint.Desktop"
+                         NavigationBreakpoint="Breakpoint.Tablet"
+                         ThemeContrast="ThemeContrast.Light">
+                        <BarBrand>
+                            <BarItem>
+                                <BarLink To="">
+                                    <BarIcon IconName="IconName.City" />
+                                    School Name
+                                </BarLink>
+                            </BarItem>
+                        </BarBrand>
+                        <BarMenu>
+                            <BarStart>
+                                <BarItem>
+                                    <BarLink To="Counter/">Counter</BarLink>
+                                </BarItem>
+                                <BarItem>
+                                    <BarLink To="FetchData/">FetchData</BarLink>
+                                </BarItem>
+                                <BarItem>
+                                    <BarDropdown>
+                                        <BarDropdownToggle>
+                                            Manage
+                                        </BarDropdownToggle>
+                                        <BarDropdownMenu>
+                                            <BarDropdownItem><BarLink To="ManageSchoolClasses/">Classes</BarLink></BarDropdownItem>
+                                            <BarDropdownItem><BarLink To="ManageTeachers/">Teachers</BarLink></BarDropdownItem>
+                                            <BarDropdownItem><BarLink To="ManageStudents/">Students</BarLink></BarDropdownItem>
+                                        </BarDropdownMenu>
+                                    </BarDropdown>
+                                </BarItem>
+                            </BarStart>
+                        </BarMenu>
+                    </Bar>
+                </Authorized>
+
+                <!-- SIDE NAVIGATION BAR FOR NON LOGGED IN USERS -->
+                <NotAuthorized>
+                    <Bar Mode="BarMode.VerticalInline"
+                         CollapseMode="BarCollapseMode.Small"
+                         Breakpoint="Breakpoint.Desktop"
+                         NavigationBreakpoint="Breakpoint.Tablet"
+                         ThemeContrast="ThemeContrast.Light">
+                        <BarBrand>
+                            <BarItem>
+                                <BarLink To="">
+                                    <BarIcon IconName="IconName.City" />
+                                    School Name
+                                </BarLink>
+                            </BarItem>
+                        </BarBrand>
+                    </Bar>
+                </NotAuthorized>
+            </AuthorizeView>
+        </LayoutSiderContent>
+    </LayoutSider>
+    <Layout>
+        <LayoutHeader Fixed="true">
+            <!-- TOP MENU FOR LOGGED IN USERS -->
+            <AuthorizeView>
+                <Authorized>
+                    <Bar Breakpoint="Breakpoint.Desktop"
+                         Background="Background.Light"
+                         ThemeContrast="ThemeContrast.Light">
+                        <BarBrand>
+                            
+                        </BarBrand>
+                        <BarToggler />
+                        <BarMenu>
+                            <BarEnd>
+                                <BarItem>
+                                    <Button>@context.User.Identity.Name</Button>
+                                </BarItem>
+                                <BarItem>
+                                    <Button Type="Blazorise.ButtonType.Link" To="Identity/Account/Manage">Manage account</Button>
+                                </BarItem>
+                                <BarItem>
+                                    <form method="post" action="Identity/Account/LogOut">
+                                        <button type="submit" class="btn btn-link">Log out</button>
+                                    </form>
+                                </BarItem>
+                            </BarEnd>
+                        </BarMenu>
+                    </Bar>
+                </Authorized>
+
+                <!-- TOP MENU FOR NON LOGGED IN USERS -->
+                <NotAuthorized>
+                    <Bar Breakpoint="Breakpoint.Desktop"
+                         Background="Background.Light"
+                         ThemeContrast="ThemeContrast.Light">
+                        <BarBrand>
+                            School Portal Test
+                        </BarBrand>
+                        <BarToggler />
+                        <BarMenu>
+                            <BarEnd>
+                                <BarItem>
+                                    <Button Color="Color.Primary" Type="Blazorise.ButtonType.Link" To="Identity/Account/LogIn">Log in</Button>
+                                    <Button Color="Color.Primary" Type="Blazorise.ButtonType.Link" To="Identity/Account/Register">Register</Button>
+                                </BarItem>
+                            </BarEnd>
+                        </BarMenu>
+                    </Bar>
+                </NotAuthorized>
+            </AuthorizeView>
+        </LayoutHeader>
+        <LayoutContent>
+            @Body
+        </LayoutContent>
+    </Layout>
+</Layout>

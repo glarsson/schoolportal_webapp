@@ -1,0 +1,21 @@
+﻿@page "/"
+
+
+
+<Container Fluid="true">
+    <h1>Development administration page</h1>
+
+
+    <Button Clicked="@DoSomething">Do something</Button>
+</Container>
+
+
+@code{
+
+    void DoSomething()
+    {
+        Console.WriteLine("Did something.\n");
+
+
+    }
+}

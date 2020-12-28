@@ -1,0 +1,188 @@
+﻿@page "/ManageStudents"
+@using School_Portal.app.Services
+@using School_Portal.app.Models 
+@using System 
+
+@inject StudentService service
+
+
+
+<Container Fluid="true">
+    <div class="container">
+        <div class="row bg-light">
+            <table class="table table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center">Avatar</th>
+                        <th class="text-center">First and middle name</th>
+                        <th class="text-center">Last name</th>
+                        <th class="text-center">Date of birth</th>
+                        <th class="text-center">Parent Email</th>
+                        <th class="text-center">Enrollment Date</th>
+                        <th class="text-center">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Students.Any())
+                    {
+                        @foreach (var student in Students)
+                        {
+                            <tr @onclick="(() => SetStudentForUpdate(student))">
+
+                                <td class="text-center"><i class="fas fa-image fa-2x"></i></td>
+                                <td class="text-center">@student.FirstMiddleName</td>
+                                <td class="text-center">@student.LastName</td>
+                                <td class="text-center">@student.BirthDate.Date.ToShortDateString()</td>
+                                <td class="text-center">@student.ParentEmail</td>
+                                <td class="text-center">@student.EnrollmentDate.Date.ToShortDateString()</td>
+                                <td class="text-center"><button type="button" class="btn btn-outline-primary" data-toggle="modal" data-target="#editModal" @onclick="(() => SetStudentForUpdate(student))">Edit</button> &nbsp; <button class=" btn btn-outline-danger" @onclick="(() => DeleteStudent(student))">Delete</button></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6"><strong>No students available</strong></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    <div class="row m-5">
+        <div class="col-5 bg-light m-2 justify-content-start">
+            <div class="p-3 mb-3 bg-primary text-white text-center">Add New Student</div>
+            <EditForm Model="@NewStudent">
+                <div class="form-group">
+                    <label for="firstMiddleName">First and middle name</label>
+                    <input type="text" id="name" class="form-control" @bind-value="@NewStudent.FirstMiddleName" />
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last name</label>
+                    <input type="text" id="lastName" class="form-control" @bind="@NewStudent.LastName" />
+                </div>
+                <div class="form-group">
+                    <label for="parentEmail">Parent Email</label>
+                    <input type="email" id="parentEmail" class="form-control" @bind="@NewStudent.ParentEmail" />
+                </div>
+                <div class="form-group">
+                    <label for="birthdate">Birthdate</label>
+                    <RadzenDatePicker @bind-Value="@NewStudent.BirthDate" DateFormat="d" Change=@(args => OnChange(args, "DatePicker", "MM/dd/yyyy")) />
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last name</label>
+                    <input type="text" id="lastName" class="form-control" @bind="@NewStudent.LastName" />
+                </div>
+                <div class="text-center p-3 mb-3">
+                    <button class="btn btn-info" @onclick="AddNewStudent"> Add Student</button>
+                </div>
+            </EditForm>
+        </div>
+        </div>
+    </div>
+
+
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="edituserModalLabel">Edit student</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Cancel">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col bg-light m-2 justify-content-end">
+                            <EditForm Model="@UpdateStudent">
+                                <div class="form-group">
+                                    <label for="firstandmiddlename">First and middle name</label>
+                                    <input type="text" id="firstandmiddlename" class="form-control" @bind-value="@UpdateStudent.FirstMiddleName" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Last name</label>
+                                    <input type="text" id="lastname" class="form-control" @bind-value="@UpdateStudent.LastName" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="parentemail">Parent email</label>
+                                    <input type="email" id="parentemail" class="form-control" @bind="@UpdateStudent.ParentEmail" />
+                                </div>
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="birthdate">Birth date</label><br />
+                                            <RadzenDatePicker @bind-Value="@UpdateStudent.BirthDate" DateFormat="d" Change=@(args => OnChange(args, "DatePicker", "MM/dd/yyyy")) />
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="form-group">
+                                            <label for="enrollmentdate">Enrollment date</label><br />
+                                            <RadzenDatePicker @bind-Value="@UpdateStudent.EnrollmentDate" DateFormat="d" Change=@(args => OnChange(args, "DatePicker2", "MM/dd/yyyy")) />
+                                        </div>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" @onclick="UpdateStudentData" data-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+</Container>
+
+@code {
+    List<Student> Students = new List<Student>();
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshStudents();
+    }
+    private async Task RefreshStudents()
+    {
+        Students = await service.GetStudentAsync();
+    }
+    public Student NewStudent { get; set; } = new Student();
+    private async Task AddNewStudent()
+    {
+        await service.AddStudentAsync(NewStudent);
+        NewStudent = new Student();
+        await RefreshStudents();
+    }
+    Student UpdateStudent = new Student();
+    private void SetStudentForUpdate(Student student)
+    {
+        UpdateStudent = student;
+    }
+    private async Task UpdateStudentData()
+    {
+        await service.UpdateStudentAsync(UpdateStudent);
+        await RefreshStudents();
+    }
+    private async Task DeleteStudent(Student student)
+    {
+        await service.DeleteStudentAsync(student);
+        await RefreshStudents();
+    }
+
+    DateTime? value = DateTime.Now;
+
+    IEnumerable<DateTime> dates = new DateTime[] { DateTime.Today.AddDays(-1), DateTime.Today.AddDays(1) };
+
+    //EventConsole console;
+
+    void OnChange(DateTime? value, string name, string format)
+    {
+        //console.Log($"{name} value changed to {value?.ToString(format)}");
+    }
+
+    void DateRenderSpecial(DateRenderEventArgs args)
+    {
+        if (dates.Contains(args.Date))
+        {
+            args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
+        }
+    }
+
+    void DateRender(DateRenderEventArgs args)
+    {
+        args.Disabled = dates.Contains(args.Date);
+    }
+}
